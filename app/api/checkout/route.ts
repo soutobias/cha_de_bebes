@@ -78,7 +78,6 @@ export async function POST(request: Request) {
       description: gift.description,
       quantity,
       unit_price: gift.price.toFixed(2),
-      unit_measure: "unit",
       external_code: String(gift.id),
     };
   });
