@@ -49,16 +49,16 @@ export function CartPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
-      const result: { initPoint?: string; error?: string } =
+      const result: { checkoutUrl?: string; error?: string } =
         await response.json();
 
-      if (!response.ok || !result.initPoint) {
+      if (!response.ok || !result.checkoutUrl) {
         throw new Error(
           result.error || "Não foi possível iniciar o pagamento.",
         );
       }
 
-      window.location.assign(result.initPoint);
+      window.location.assign(result.checkoutUrl);
     } catch (checkoutError) {
       setError(
         checkoutError instanceof Error

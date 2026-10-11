@@ -27,9 +27,7 @@ SITE_URL=http://localhost:3000
 
 For Vercel, add the same variables in **Project Settings → Environment Variables** and set `SITE_URL` to the production URL. `MERCADO_PAGO_ACCESS_TOKEN` is private and must never use the `NEXT_PUBLIC_` prefix.
 
-`MERCADO_PAGO_WEBHOOK_URL` is optional and can be added after a public HTTPS webhook endpoint is configured in Mercado Pago.
-
-The browser sends only product IDs and quantities to `/api/checkout`. The server reads product names and prices from `data/presentes.json`, creates the Checkout Pro preference with the private access token, and returns only Mercado Pago's checkout URL.
+The browser sends only product IDs and quantities to `/api/checkout`. The server reads product names and prices from `data/presentes.json`, creates a Checkout Pro Order with the private access token, and returns only Mercado Pago's checkout URL. This simple flow does not store orders or process webhooks; payment records remain available in the Mercado Pago account.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

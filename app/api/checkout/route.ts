@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
+import { MercadoPagoConfig, Order } from "mercadopago";
 import giftsData from "@/data/presentes.json";
 import { MAX_ITEM_QUANTITY, type CartItem, type Gift } from "@/lib/cart";
 
@@ -71,51 +71,62 @@ export async function POST(request: Request) {
     quantities.set(item.id, quantity);
   }
 
-  const preferenceItems = Array.from(quantities, ([id, quantity]) => {
+  const orderItems = Array.from(quantities, ([id, quantity]) => {
     const gift = giftCatalog.get(id)!;
     return {
-      id: String(gift.id),
       title: gift.title,
       description: gift.description,
       quantity,
-      currency_id: "BRL",
-      unit_price: gift.price,
+      unit_price: gift.price.toFixed(2),
+      unit_measure: "unit",
+      external_code: String(gift.id),
     };
   });
 
+  const totalAmount = Array.from(quantities).reduce((total, [id, quantity]) => {
+    const gift = giftCatalog.get(id)!;
+    return total + gift.price * quantity;
+  }, 0);
+
   const configuredSiteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   const siteUrl = configuredSiteUrl || new URL(request.url).origin;
-  const notificationUrl = process.env.MERCADO_PAGO_WEBHOOK_URL;
 
   try {
     const client = new MercadoPagoConfig({
       accessToken,
       options: { timeout: 8000 },
     });
-    const preference = new Preference(client);
-    const result = await preference.create({
+    const order = new Order(client);
+    const result = await order.create({
       body: {
-        items: preferenceItems,
+        type: "online",
+        processing_mode: "manual",
+        capture_mode: "automatic_async",
+        currency: "BRL",
+        total_amount: totalAmount.toFixed(2),
+        items: orderItems,
         external_reference: crypto.randomUUID(),
-        statement_descriptor: "CHA DOS GEMEOS",
-        back_urls: {
-          success: `${siteUrl}/carrinho?status=success`,
-          pending: `${siteUrl}/carrinho?status=pending`,
-          failure: `${siteUrl}/carrinho?status=failure`,
+        description: "Presentes para o chá de bebê",
+        config: {
+          statement_descriptor: "CHA GEMEOS",
+          online: {
+            success_url: `${siteUrl}/carrinho?status=success`,
+            pending_url: `${siteUrl}/carrinho?status=pending`,
+            failure_url: `${siteUrl}/carrinho?status=failure`,
+            auto_return: "approved",
+          },
         },
-        auto_return: "approved",
-        ...(notificationUrl ? { notification_url: notificationUrl } : {}),
       },
       requestOptions: { idempotencyKey: crypto.randomUUID() },
     });
 
-    if (!result.init_point) {
-      throw new Error("Mercado Pago did not return an init_point");
+    if (!result.checkout_url) {
+      throw new Error("Mercado Pago did not return a checkout_url");
     }
 
-    return Response.json({ initPoint: result.init_point });
+    return Response.json({ checkoutUrl: result.checkout_url });
   } catch (error) {
-    console.error("Failed to create Mercado Pago preference", error);
+    console.error("Failed to create Mercado Pago order", error);
     return Response.json(
       { error: "Não foi possível iniciar o pagamento. Tente novamente." },
       { status: 502 },
