@@ -8,12 +8,37 @@ import { formatBRL, MAX_ITEM_QUANTITY, type Gift } from "@/lib/cart";
 import { useCart } from "./cart-provider";
 
 const gifts = giftsData as Gift[];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BUYER_STORAGE_KEY = "cha-dos-gemeos-buyer";
+
+type StoredBuyer = {
+  name: string;
+  email: string;
+};
+
+function isStoredBuyer(value: unknown): value is StoredBuyer {
+  if (typeof value !== "object" || value === null) return false;
+
+  const buyer = value as Partial<StoredBuyer>;
+  return typeof buyer.name === "string" && typeof buyer.email === "string";
+}
 
 export function CartPage() {
   const { items, isReady, updateQuantity, removeItem } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [hasTouchedName, setHasTouchedName] = useState(false);
+  const [hasTouchedEmail, setHasTouchedEmail] = useState(false);
+  const [isBuyerReady, setIsBuyerReady] = useState(false);
+
+  const normalizedName = name.trim().replace(/\s+/g, " ");
+  const normalizedEmail = email.trim().toLowerCase();
+  const isNameValid =
+    normalizedName.length >= 2 && normalizedName.length <= 100;
+  const isEmailValid = EMAIL_PATTERN.test(normalizedEmail);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -24,6 +49,38 @@ export function CartPage() {
 
     return () => window.clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    let storedBuyer: StoredBuyer | null = null;
+
+    try {
+      const storedValue = localStorage.getItem(BUYER_STORAGE_KEY);
+      const parsedValue: unknown = storedValue ? JSON.parse(storedValue) : null;
+
+      if (isStoredBuyer(parsedValue)) storedBuyer = parsedValue;
+    } catch {
+      localStorage.removeItem(BUYER_STORAGE_KEY);
+    }
+
+    const timeout = window.setTimeout(() => {
+      if (storedBuyer) {
+        setName(storedBuyer.name);
+        setEmail(storedBuyer.email);
+      }
+      setIsBuyerReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!isBuyerReady) return;
+
+    localStorage.setItem(
+      BUYER_STORAGE_KEY,
+      JSON.stringify({ name, email } satisfies StoredBuyer),
+    );
+  }, [email, isBuyerReady, name]);
 
   const cartLines = useMemo(
     () =>
@@ -39,7 +96,13 @@ export function CartPage() {
     0,
   );
 
-  async function checkout() {
+  async function checkout(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setHasTouchedName(true);
+    setHasTouchedEmail(true);
+
+    if (!isNameValid || !isEmailValid) return;
+
     setError("");
     setIsCheckingOut(true);
 
@@ -47,7 +110,10 @@ export function CartPage() {
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({
+          items,
+          email: normalizedEmail,
+        }),
       });
       const result: { checkoutUrl?: string; error?: string } =
         await response.json();
@@ -109,7 +175,7 @@ export function CartPage() {
         {paymentStatus && (
           <div className="rounded-2xl border border-forest/15 bg-[#edf0d3]/80 px-5 py-4 text-sm text-forest">
             {paymentStatus === "success"
-              ? "Você retornou do Mercado Pago. A confirmação final será enviada pelo próprio Mercado Pago. Obrigado pelo carinho!"
+              ? "Pagamento concluído! Enviaremos por e-mail a confirmação do presente assim que o Mercado Pago confirmar o processamento. Obrigado pelo carinho!"
               : paymentStatus === "pending"
                 ? "O Mercado Pago está processando o pagamento."
                 : "O pagamento não foi concluído. Você pode tentar novamente."}
@@ -178,14 +244,79 @@ export function CartPage() {
           <span>Total</span>
           <strong className="text-lg text-forest">{formatBRL(total)}</strong>
         </div>
-        <button
-          className="w-full rounded-full bg-forest px-5 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f] disabled:cursor-wait disabled:opacity-60"
-          type="button"
-          disabled={isCheckingOut}
-          onClick={checkout}
-        >
-          {isCheckingOut ? "Abrindo Mercado Pago…" : "Pagar com Mercado Pago"}
-        </button>
+        <form noValidate onSubmit={checkout}>
+          <label
+            className="mb-2 block text-sm font-bold text-forest"
+            htmlFor="checkout-name"
+          >
+            Nome completo
+          </label>
+          <input
+            id="checkout-name"
+            className="w-full rounded-xl border border-forest/25 bg-white/80 px-4 py-3 text-sm text-forest outline-none transition placeholder:text-muted/65 focus:border-forest focus:ring-2 focus:ring-forest/15 aria-invalid:border-[#8b4d42] aria-invalid:ring-[#8b4d42]/15"
+            type="text"
+            autoComplete="name"
+            maxLength={100}
+            placeholder="Seu nome"
+            value={name}
+            aria-describedby="checkout-name-help"
+            aria-invalid={hasTouchedName && !isNameValid}
+            onBlur={() => setHasTouchedName(true)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setError("");
+            }}
+          />
+          <p
+            id="checkout-name-help"
+            className={`mt-1.5 min-h-4 text-xs ${
+              hasTouchedName && !isNameValid ? "text-[#8b4d42]" : "text-muted"
+            }`}
+          >
+            {hasTouchedName && !isNameValid
+              ? "Digite seu nome para continuar."
+              : "Seu nome ficará salvo somente neste dispositivo."}
+          </p>
+          <label
+            className="mt-3 mb-2 block text-sm font-bold text-forest"
+            htmlFor="checkout-email"
+          >
+            E-mail para confirmação
+          </label>
+          <input
+            id="checkout-email"
+            className="w-full rounded-xl border border-forest/25 bg-white/80 px-4 py-3 text-sm text-forest outline-none transition placeholder:text-muted/65 focus:border-forest focus:ring-2 focus:ring-forest/15 aria-invalid:border-[#8b4d42] aria-invalid:ring-[#8b4d42]/15"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="seuemail@exemplo.com"
+            value={email}
+            aria-describedby="checkout-email-help"
+            aria-invalid={hasTouchedEmail && !isEmailValid}
+            onBlur={() => setHasTouchedEmail(true)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setError("");
+            }}
+          />
+          <p
+            id="checkout-email-help"
+            className={`mt-1.5 min-h-4 text-xs ${
+              hasTouchedEmail && !isEmailValid ? "text-[#8b4d42]" : "text-muted"
+            }`}
+          >
+            {hasTouchedEmail && !isEmailValid
+              ? "Digite um e-mail válido para continuar."
+              : "O e-mail será enviado ao Mercado Pago para identificar o pagamento."}
+          </p>
+          <button
+            className="mt-4 w-full rounded-full bg-forest px-5 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
+            type="submit"
+            disabled={isCheckingOut || !isNameValid || !isEmailValid}
+          >
+            {isCheckingOut ? "Abrindo Mercado Pago…" : "Pagar com Mercado Pago"}
+          </button>
+        </form>
         <Link
           className="mt-2.5 flex w-full items-center justify-center rounded-full border border-forest/30 bg-white/55 px-5 py-3 text-sm font-bold text-forest transition hover:-translate-y-0.5 hover:bg-white"
           href="/presentes"

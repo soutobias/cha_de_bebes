@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 
 const gifts = giftsData as Gift[];
 const giftCatalog = new Map(gifts.map((gift) => [gift.id, gift]));
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function isCartItem(value: unknown): value is CartItem {
   if (typeof value !== "object" || value === null) return false;
@@ -41,6 +42,19 @@ export async function POST(request: Request) {
     typeof payload === "object" && payload !== null
       ? (payload as { items?: unknown }).items
       : null;
+  const submittedEmail =
+    typeof payload === "object" &&
+    payload !== null &&
+    typeof (payload as { email?: unknown }).email === "string"
+      ? (payload as { email: string }).email.trim().toLowerCase()
+      : "";
+
+  if (submittedEmail.length > 254 || !EMAIL_PATTERN.test(submittedEmail)) {
+    return Response.json(
+      { error: "Informe um e-mail válido para continuar." },
+      { status: 400 },
+    );
+  }
 
   if (
     !Array.isArray(submittedItems) ||
@@ -89,6 +103,7 @@ export async function POST(request: Request) {
 
   const configuredSiteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   const siteUrl = configuredSiteUrl || new URL(request.url).origin;
+  const isTestMode = process.env.MERCADO_PAGO_TEST_MODE === "true";
 
   try {
     const client = new MercadoPagoConfig({
@@ -106,9 +121,11 @@ export async function POST(request: Request) {
         items: orderItems,
         external_reference: crypto.randomUUID(),
         description: "Presentes para o chá de bebê",
+        ...(!isTestMode ? { payer: { email: submittedEmail } } : {}),
         config: {
           statement_descriptor: "CHA GEMEOS",
           online: {
+            callback_url: `${siteUrl}/api/mercadopago/webhook`,
             success_url: `${siteUrl}/carrinho?status=success`,
             pending_url: `${siteUrl}/carrinho?status=pending`,
             failure_url: `${siteUrl}/carrinho?status=failure`,

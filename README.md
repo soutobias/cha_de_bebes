@@ -22,12 +22,24 @@ Copy `.env.example` to `.env.local` and configure:
 
 ```bash
 MERCADO_PAGO_ACCESS_TOKEN=APP_USR-your-private-access-token
+MERCADO_PAGO_TEST_MODE=false
+MERCADO_PAGO_WEBHOOK_SECRET=your-webhook-secret
+RESEND_API_KEY=re_your-resend-api-key
+EMAIL_FROM=Cha de Bebe <presentes@tonessa.baby>
+NOTIFICATION_EMAIL=your-email@example.com
+EMAIL_TEST_RECIPIENT=your-email@example.com
 SITE_URL=http://localhost:3000
 ```
 
 For Vercel, add the same variables in **Project Settings → Environment Variables** and set `SITE_URL` to the production URL. `MERCADO_PAGO_ACCESS_TOKEN` is private and must never use the `NEXT_PUBLIC_` prefix.
 
-The browser sends only product IDs and quantities to `/api/checkout`. The server reads product names and prices from `data/presentes.json`, creates a Checkout Pro Order with the private access token, and returns only Mercado Pago's checkout URL. This simple flow does not store orders or process webhooks; payment records remain available in the Mercado Pago account.
+The browser stores the buyer name and email in local storage, then sends only the email with the product IDs and quantities to `/api/checkout`. The server validates the email, reads product names and prices from `data/presentes.json`, creates a Checkout Pro Order with the private access token, and returns only Mercado Pago's checkout URL. The buyer name remains only in the browser. When using sandbox credentials, enter the exact email of the Mercado Pago test buyer account in the cart.
+
+Configure the Mercado Pago **Order (Mercado Pago)** production webhook as `https://tonessa.baby/api/mercadopago/webhook`, then copy its secret to `MERCADO_PAGO_WEBHOOK_SECRET`. The endpoint validates Mercado Pago's signature, retrieves the Order from Mercado Pago, and sends confirmations only for a fully paid, approved Order. Resend receives separate idempotency keys for the buyer and owner messages so webhook retries do not normally produce duplicate emails.
+
+In Resend, verify `tonessa.baby` and add the requested DNS records before using the `EMAIL_FROM` address. All payment and email credentials are server-only and must never use the `NEXT_PUBLIC_` prefix.
+
+For sandbox tests, set `MERCADO_PAGO_TEST_MODE=true`. The checkout will not send `payer.email`, since current Mercado Pago test buyer accounts expose only a username, password, User ID, and verification code. Log in to Mercado Pago with that test username. Also set `EMAIL_TEST_RECIPIENT` to a real inbox: notifications with `live_mode: false` will send the buyer copy there instead. In production, remove `MERCADO_PAGO_TEST_MODE` or set it to `false`; the buyer email entered in the cart will then be sent to Mercado Pago and used for the confirmation.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
