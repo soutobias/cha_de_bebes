@@ -1,4 +1,5 @@
 import {
+  InvalidWebhookSignatureError,
   MercadoPagoConfig,
   Order,
   WebhookSignatureValidator,
@@ -130,7 +131,10 @@ function createEmailContent({
 
 export async function POST(request: Request) {
   const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-  const webhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+  const productionWebhookSecret =
+    process.env.MERCADO_PAGO_WEBHOOK_SECRET?.trim();
+  const testWebhookSecret =
+    process.env.MERCADO_PAGO_WEBHOOK_SECRET_TEST?.trim();
   const resendApiKey = process.env.RESEND_API_KEY;
   const emailFrom = process.env.EMAIL_FROM;
   const notificationEmail = process.env.NOTIFICATION_EMAIL;
@@ -139,7 +143,7 @@ export async function POST(request: Request) {
 
   if (
     !accessToken ||
-    !webhookSecret ||
+    (!productionWebhookSecret && !testWebhookSecret) ||
     !resendApiKey ||
     !emailFrom ||
     !notificationEmail
@@ -164,9 +168,23 @@ export async function POST(request: Request) {
   const bodyDataId =
     typeof payload.data?.id === "string" ? payload.data.id : null;
   const orderId = queryDataId || bodyDataId;
+  const webhookSecret =
+    payload.live_mode === false
+      ? testWebhookSecret || productionWebhookSecret
+      : productionWebhookSecret;
 
   if (!orderId) {
     return Response.json({ error: "Missing order ID" }, { status: 400 });
+  }
+
+  if (!webhookSecret) {
+    console.error("Webhook secret is not configured for this environment", {
+      liveMode: payload.live_mode,
+    });
+    return Response.json(
+      { error: "Webhook secret not configured" },
+      { status: 503 },
+    );
   }
 
   try {
@@ -176,7 +194,18 @@ export async function POST(request: Request) {
       dataId: orderId,
       secret: webhookSecret,
     });
-  } catch {
+  } catch (error) {
+    console.error("Invalid Mercado Pago webhook signature", {
+      orderId,
+      liveMode: payload.live_mode,
+      reason:
+        error instanceof InvalidWebhookSignatureError
+          ? error.reason
+          : "unknown",
+      hasSignature: Boolean(request.headers.get("x-signature")),
+      hasRequestId: Boolean(request.headers.get("x-request-id")),
+      usedTestSecret: payload.live_mode === false && Boolean(testWebhookSecret),
+    });
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -190,17 +219,20 @@ export async function POST(request: Request) {
       options: { timeout: 8000 },
     });
     const order = await new Order(mercadoPago).get({ id: orderId });
-    const approvedPayment = order.transactions?.payments?.some(
-      (payment) => payment.status === "approved",
+    const successfulPayment = order.transactions?.payments?.some(
+      (payment) =>
+        payment.status === "approved" ||
+        (payment.status === "processed" &&
+          payment.status_detail === "accredited"),
     );
     const totalInCents = moneyToCents(order.total_amount);
     const paidInCents = moneyToCents(order.total_paid_amount);
 
-    if (!approvedPayment || totalInCents <= 0 || paidInCents < totalInCents) {
+    if (!successfulPayment || totalInCents <= 0 || paidInCents < totalInCents) {
       console.info("Mercado Pago order is not fully paid yet", {
         orderId,
         orderStatus: order.status,
-        approvedPayment: Boolean(approvedPayment),
+        successfulPayment: Boolean(successfulPayment),
         totalInCents,
         paidInCents,
       });

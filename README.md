@@ -24,6 +24,7 @@ Copy `.env.example` to `.env.local` and configure:
 MERCADO_PAGO_ACCESS_TOKEN=APP_USR-your-private-access-token
 MERCADO_PAGO_TEST_MODE=false
 MERCADO_PAGO_WEBHOOK_SECRET=your-webhook-secret
+MERCADO_PAGO_WEBHOOK_SECRET_TEST=your-test-webhook-secret
 RESEND_API_KEY=re_your-resend-api-key
 EMAIL_FROM=Cha de Bebe <presentes@tonessa.baby>
 NOTIFICATION_EMAIL=your-email@example.com
@@ -36,6 +37,8 @@ For Vercel, add the same variables in **Project Settings → Environment Variabl
 The browser stores the buyer name and email in local storage, then sends only the email with the product IDs and quantities to `/api/checkout`. The server validates the email, reads product names and prices from `data/presentes.json`, creates a Checkout Pro Order with the private access token, and returns only Mercado Pago's checkout URL. The buyer name remains only in the browser. When using sandbox credentials, enter the exact email of the Mercado Pago test buyer account in the cart.
 
 Configure the Mercado Pago **Order (Mercado Pago)** production webhook as `https://tonessa.baby/api/mercadopago/webhook`, then copy its secret to `MERCADO_PAGO_WEBHOOK_SECRET`. The endpoint validates Mercado Pago's signature, retrieves the Order from Mercado Pago, and sends confirmations only for a fully paid, approved Order. Resend receives separate idempotency keys for the buyer and owner messages so webhook retries do not normally produce duplicate emails.
+
+If Mercado Pago shows a separate secret for the test environment, store it as `MERCADO_PAGO_WEBHOOK_SECRET_TEST`. Notifications with `live_mode: false` use this test secret, while production notifications use `MERCADO_PAGO_WEBHOOK_SECRET`.
 
 In Resend, verify `tonessa.baby` and add the requested DNS records before using the `EMAIL_FROM` address. All payment and email credentials are server-only and must never use the `NEXT_PUBLIC_` prefix.
 
