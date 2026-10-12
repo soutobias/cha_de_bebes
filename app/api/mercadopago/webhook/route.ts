@@ -182,12 +182,6 @@ export async function POST(request: Request) {
   const notificationEmail = process.env.NOTIFICATION_EMAIL;
   const testEmailRecipient = process.env.EMAIL_TEST_RECIPIENT?.trim();
   const isConfiguredTestMode = process.env.MERCADO_PAGO_TEST_MODE === "true";
-  console.log("Test webhook secret is configured:", Boolean(testWebhookSecret));
-  console.log("Test mode is configured:", Boolean(isConfiguredTestMode));
-  console.log(
-    "Test email recipient is configured:",
-    Boolean(testEmailRecipient),
-  );
   if (
     !accessToken ||
     (!productionWebhookSecret && !testWebhookSecret) ||
@@ -261,7 +255,11 @@ export async function POST(request: Request) {
   }
 
   if (!signatureStrategy || !signatureSecretSource) {
-    console.error("Invalid Mercado Pago webhook signature", {
+    const canVerifyTestOrderWithApi =
+      isConfiguredTestMode &&
+      payload.live_mode === false &&
+      orderId.startsWith("ORDTST");
+    const signatureDetails = {
       orderId,
       liveMode: payload.live_mode,
       reason:
@@ -272,15 +270,31 @@ export async function POST(request: Request) {
       hasRequestId: Boolean(request.headers.get("x-request-id")),
       hasQueryDataId: Boolean(queryDataId),
       testedSecretSources: secretCandidates.map((secret) => secret.source),
-    });
-    return Response.json({ error: "Invalid signature" }, { status: 401 });
+    };
+
+    if (!canVerifyTestOrderWithApi) {
+      console.error("Invalid Mercado Pago webhook signature", signatureDetails);
+      return Response.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    // Mercado Pago sandbox notifications can occasionally be signed with a
+    // secret different from the one exposed by the test Webhooks panel. This
+    // fallback is deliberately limited to ORDTST orders while the deployment
+    // is explicitly in test mode. The order is still authenticated below by
+    // retrieving it directly from Mercado Pago with the server-side token.
+    console.warn(
+      "Sandbox signature mismatch; verifying test order through Mercado Pago API",
+      signatureDetails,
+    );
+    signatureStrategy = "sandbox-api-verification";
+    signatureSecretSource = "none";
   }
 
   if (!orderId.startsWith("ORD")) {
     return Response.json({ received: true });
   }
 
-  console.info("Mercado Pago webhook signature validated", {
+  console.info("Mercado Pago webhook accepted", {
     orderId,
     signatureStrategy,
     signatureSecretSource,
