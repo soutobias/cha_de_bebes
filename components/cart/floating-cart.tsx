@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useRef, useState, type PointerEvent } from "react";
 import { CartIcon } from "./cart-icon";
 import { useCart } from "./cart-provider";
@@ -8,6 +9,7 @@ import { useCart } from "./cart-provider";
 type Position = { x: number; y: number };
 
 export function FloatingCart() {
+  const pathname = usePathname();
   const { itemCount, attentionVersion, isReady } = useCart();
   const [position, setPosition] = useState<Position | null>(null);
   const drag = useRef({
@@ -18,7 +20,7 @@ export function FloatingCart() {
     moved: false,
   });
 
-  if (!isReady || itemCount === 0) return null;
+  if (pathname === "/carrinho" || !isReady || itemCount === 0) return null;
 
   function handlePointerDown(event: PointerEvent<HTMLAnchorElement>) {
     const rect = event.currentTarget.getBoundingClientRect();

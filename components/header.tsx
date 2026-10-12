@@ -29,7 +29,7 @@ export function Header() {
         <Link
           className="flex items-center gap-2.5"
           href="/"
-          aria-label="Chá dos Gêmeos — início"
+          aria-label="Bebês Tonessa — início"
           onClick={() => setIsMenuOpen(false)}
         >
           <Image
@@ -97,7 +97,7 @@ export function Header() {
         <Link
           className="flex items-center gap-2.5 max-sm:hidden"
           href="/"
-          aria-label="Chá dos Gêmeos — início"
+          aria-label="Bebês Tonessa — início"
         >
           <Image
             src="/images/logo2.png"

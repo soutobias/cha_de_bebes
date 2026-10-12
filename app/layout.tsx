@@ -19,9 +19,32 @@ const script = Parisienne({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Chá dos Gêmeos", template: "%s | Chá dos Gêmeos" },
-  description:
-    "Um encontro cheio de carinho para celebrar a chegada dos nossos bebês.",
+  metadataBase: new URL("https://tonessa.baby"),
+  title: { default: "Bebês Tonessa", template: "%s | Bebês Tonessa" },
+  description: "Duas Ervilhinhas numa Vagem -Chá de bebê dos gêmeos Tonessa.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: "/",
+    siteName: "Bebês Tonessa",
+    title: "Bebês Tonessa",
+    description: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
+    images: [
+      {
+        url: "/images/shared-image.png",
+        width: 1902,
+        height: 914,
+        alt: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bebês Tonessa",
+    description: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
+    images: ["/images/shared-image.png"],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

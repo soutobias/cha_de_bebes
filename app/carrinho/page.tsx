@@ -6,7 +6,21 @@ export const metadata: Metadata = { title: "Carrinho" };
 
 export default function CarrinhoPage() {
   return (
-    <section className="min-h-svh opacity-80 bg-[url('/images/banner.png')] bg-cover bg-center bg-fixed pt-28 pb-14 max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-scroll max-sm:pt-[calc(5rem+env(safe-area-inset-top))] max-sm:pb-10">
+    <section
+      className="
+    relative isolate min-h-svh
+    before:absolute before:inset-0 before:-z-10
+    before:bg-[url('/images/banner.png')]
+    before:bg-cover before:bg-center before:bg-fixed
+    before:opacity-50
+    max-sm:before:bg-[url('/images/banner-mobile.png')]
+    max-sm:before:bg-scroll
+    pt-28 pb-14
+    max-sm:pt-[calc(5rem+env(safe-area-inset-top))]
+    max-sm:pb-10
+  "
+    >
+      {" "}
       <div className="mx-auto w-[min(1100px,calc(100%-40px))] max-sm:w-[calc(100%-28px)]">
         <div className="mx-auto mb-10 max-w-2xl text-center">
           <div className="mx-auto flex items-center max-w-100 justify-center gap-4 max-sm:gap-1">

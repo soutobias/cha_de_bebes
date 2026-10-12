@@ -410,7 +410,7 @@ export function CartPage() {
           >
             {hasTouchedName && !isNameValid
               ? "Digite seu nome para continuar."
-              : "Seu nome ficará salvo somente neste dispositivo."}
+              : ""}
           </p>
           <label
             className="mt-3 mb-2 block text-sm font-bold text-forest"
@@ -442,7 +442,7 @@ export function CartPage() {
           >
             {hasTouchedEmail && !isEmailValid
               ? "Digite um e-mail válido para continuar."
-              : "O e-mail será enviado ao Mercado Pago para identificar o pagamento."}
+              : ""}
           </p>
           <button
             className="mt-4 w-full rounded-full bg-forest px-5 py-3.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f] disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-50"
