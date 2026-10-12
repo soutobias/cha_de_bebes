@@ -182,7 +182,12 @@ export async function POST(request: Request) {
   const notificationEmail = process.env.NOTIFICATION_EMAIL;
   const testEmailRecipient = process.env.EMAIL_TEST_RECIPIENT?.trim();
   const isConfiguredTestMode = process.env.MERCADO_PAGO_TEST_MODE === "true";
-
+  console.log("Test webhook secret is configured:", Boolean(testWebhookSecret));
+  console.log("Test mode is configured:", Boolean(isConfiguredTestMode));
+  console.log(
+    "Test email recipient is configured:",
+    Boolean(testEmailRecipient),
+  );
   if (
     !accessToken ||
     (!productionWebhookSecret && !testWebhookSecret) ||
