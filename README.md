@@ -40,6 +40,8 @@ Configure the Mercado Pago **Order (Mercado Pago)** production webhook as `https
 
 If Mercado Pago shows a separate secret for the test environment, store it as `MERCADO_PAGO_WEBHOOK_SECRET_TEST`. Notifications with `live_mode: false` use this test secret, while production notifications use `MERCADO_PAGO_WEBHOOK_SECRET`.
 
+Webhook signature validation lowercases the alphanumeric Mercado Pago Order ID before calculating the HMAC, as required for IDs returned in uppercase such as `ORDTST...`. The original uppercase ID is preserved when retrieving the Order from the API.
+
 In Resend, verify `tonessa.baby` and add the requested DNS records before using the `EMAIL_FROM` address. All payment and email credentials are server-only and must never use the `NEXT_PUBLIC_` prefix.
 
 For sandbox tests, set `MERCADO_PAGO_TEST_MODE=true`. The checkout will not send `payer.email`, since current Mercado Pago test buyer accounts expose only a username, password, User ID, and verification code. Log in to Mercado Pago with that test username. Also set `EMAIL_TEST_RECIPIENT` to a real inbox: notifications with `live_mode: false` will send the buyer copy there instead. In production, remove `MERCADO_PAGO_TEST_MODE` or set it to `false`; the buyer email entered in the cart will then be sent to Mercado Pago and used for the confirmation.
