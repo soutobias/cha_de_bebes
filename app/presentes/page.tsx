@@ -6,7 +6,27 @@ import type { Gift } from "@/lib/cart";
 export const metadata: Metadata = { title: "Presentes" };
 export default function PresentesPage() {
   return (
-    <section className="min-h-svh bg-[url('/images/banner-detalhes2.png')] bg-cover bg-center bg-fixed pt-28 pb-10 max-sm:bg-[url('/images/banner-details-mobile.png')] max-sm:bg-fixed max-sm:pt-[calc(5rem+env(safe-area-inset-top))] max-sm:pb-17">
+    <section
+      className="
+    relative isolate min-h-svh
+    pt-28 pb-10
+    max-sm:pt-[calc(5rem+env(safe-area-inset-top))]
+    max-sm:pb-17
+
+    before:absolute
+    before:inset-0
+    before:-z-10
+    before:content-['']
+    before:bg-[url('/images/banner-detalhes2.png')]
+    before:bg-cover
+    before:bg-center
+    before:bg-fixed
+    before:opacity-50
+
+    max-sm:before:bg-[url('/images/banner-details-mobile.png')]
+    max-sm:before:bg-fixed
+  "
+    >
       <div className="pb-20 mx-auto w-[min(1160px,calc(100%-40px))] max-sm:w-[calc(100%-20px)]">
         <div className="mx-auto mb-13 max-w-200 text-center">
           <div className="mx-auto flex items-center max-w-100 justify-center gap-4 max-sm:gap-1">

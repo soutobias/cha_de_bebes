@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 type DetailCardProps = {
   label: string;
   title: string;
-  text: string;
+  text?: string;
   image: string;
   children?: ReactNode;
   className?: string;
@@ -37,7 +37,9 @@ export function DetailCard({
         <h3 className="my-2 text-base leading-snug font-medium text-ink max-sm:my-1.5 max-sm:text-sm">
           {title}
         </h3>
-        <p className="m-0 text-sm text-muted max-sm:text-xs">{text}</p>
+        {text && (
+          <p className="m-0 text-sm text-muted max-sm:text-xs">{text}</p>
+        )}
         {children}
       </div>
     </article>

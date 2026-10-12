@@ -4,7 +4,7 @@ export const metadata: Metadata = { title: "Confirmação" };
 export default function ConfirmacaoPage() {
   const formUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
   return (
-    <section className="min-h-svh bg-[url('/images/banner.png')] bg-cover bg-center bg-fixed pt-28 pb-23 max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-scroll max-sm:pt-[calc(5rem+env(safe-area-inset-top))] max-sm:pb-17">
+    <section className="min-h-svh opacity-50 bg-[url('/images/banner.png')] bg-cover bg-center bg-fixed pt-28 pb-23 max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-scroll max-sm:pt-[calc(5rem+env(safe-area-inset-top))] max-sm:pb-17">
       <div className="mx-auto w-[min(940px,calc(100%-40px))] max-sm:w-[calc(100%-28px)]">
         <div className="mx-auto max-w-170 text-center">
           <div className="mx-auto flex items-center max-w-100 justify-center gap-4 max-sm:gap-1">

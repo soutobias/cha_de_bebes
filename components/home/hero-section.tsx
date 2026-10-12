@@ -5,7 +5,7 @@ export function HeroSection() {
   return (
     <section className="relative isolate grid min-h-svh items-center overflow-hidden bg-[#f8f6e8]">
       <div
-        className="absolute inset-0 -z-10 bg-[url('/images/banner.png')] bg-cover bg-center max-md:bg-position-[62%_center] max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-center"
+        className="absolute inset-0 -z-10 opacity-50 bg-[url('/images/banner.png')] bg-cover bg-center max-md:bg-position-[62%_center] max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-center"
         aria-hidden="true"
       />
       <div

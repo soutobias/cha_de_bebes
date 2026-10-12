@@ -30,7 +30,22 @@ const details = [
 export function DetailsSection() {
   return (
     <section
-      className="min-h-svh overflow-hidden bg-[url('/images/banner-detalhes2.png')] bg-cover bg-center pt-12 pb-24 max-sm:bg-[url('/images/banner-details-mobile.png')] max-sm:pt-28 max-sm:pb-12"
+      className="
+    relative isolate min-h-svh overflow-hidden
+    pt-12 pb-24
+    max-sm:pt-28 max-sm:pb-12
+
+    before:absolute
+    before:inset-0
+    before:-z-10
+    before:content-['']
+    before:bg-[url('/images/banner-detalhes2.png')]
+    before:bg-cover
+    before:bg-center
+    before:opacity-50
+
+    max-sm:before:bg-[url('/images/banner-details-mobile.png')]
+  "
       id="detalhes"
     >
       <div className="mx-auto w-[min(1160px,calc(100%-40px))] max-sm:w-[calc(100%-28px)]">
@@ -85,7 +100,7 @@ export function DetailsSection() {
             className="max-sm:col-span-2"
             label="Confirmação + Presentes"
             title="Confirme sua presença e veja nossa lista de presentes"
-            text="Com muito carinho!"
+            text=""
             image="/images/gift-icon.png"
           >
             <div className="mt-3 flex flex-wrap gap-2 justify-center">
