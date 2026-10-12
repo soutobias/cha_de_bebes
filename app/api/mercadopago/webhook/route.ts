@@ -41,6 +41,49 @@ function moneyToCents(value: string | undefined) {
   return Number.isFinite(amount) ? Math.round(amount * 100) : 0;
 }
 
+function validateWebhookSignature({
+  xSignature,
+  xRequestId,
+  queryDataId,
+  bodyDataId,
+  secret,
+}: {
+  xSignature: string | null;
+  xRequestId: string | null;
+  queryDataId: string | null;
+  bodyDataId: string | null;
+  secret: string;
+}) {
+  const candidates = queryDataId
+    ? [queryDataId.toLowerCase(), queryDataId]
+    : [
+        undefined,
+        ...(bodyDataId ? [bodyDataId.toLowerCase(), bodyDataId] : []),
+      ];
+  const uniqueCandidates = [...new Set(candidates)];
+  let lastError: unknown;
+
+  for (const dataId of uniqueCandidates) {
+    try {
+      WebhookSignatureValidator.validate({
+        xSignature,
+        xRequestId,
+        dataId,
+        secret,
+      });
+      return dataId === undefined
+        ? "without-data-id"
+        : dataId === dataId.toLowerCase()
+          ? "lowercase-data-id"
+          : "original-data-id";
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
 function createEmailContent({
   heading,
   introduction,
@@ -164,7 +207,9 @@ export async function POST(request: Request) {
   }
 
   const requestUrl = new URL(request.url);
-  const queryDataId = requestUrl.searchParams.get("data.id");
+  const queryDataId =
+    requestUrl.searchParams.get("data.id") ??
+    requestUrl.searchParams.get("data_id");
   const bodyDataId =
     typeof payload.data?.id === "string" ? payload.data.id : null;
   const orderId = queryDataId || bodyDataId;
@@ -187,13 +232,14 @@ export async function POST(request: Request) {
     );
   }
 
+  let signatureStrategy: string;
+
   try {
-    WebhookSignatureValidator.validate({
+    signatureStrategy = validateWebhookSignature({
       xSignature: request.headers.get("x-signature"),
       xRequestId: request.headers.get("x-request-id"),
-      // Mercado Pago signs alphanumeric Order IDs in lowercase even though
-      // the notification and API expose them as uppercase ORDTST/ORD values.
-      dataId: orderId.toLowerCase(),
+      queryDataId,
+      bodyDataId,
       secret: webhookSecret,
     });
   } catch (error) {
@@ -206,6 +252,7 @@ export async function POST(request: Request) {
           : "unknown",
       hasSignature: Boolean(request.headers.get("x-signature")),
       hasRequestId: Boolean(request.headers.get("x-request-id")),
+      hasQueryDataId: Boolean(queryDataId),
       usedTestSecret: payload.live_mode === false && Boolean(testWebhookSecret),
     });
     return Response.json({ error: "Invalid signature" }, { status: 401 });
@@ -214,6 +261,11 @@ export async function POST(request: Request) {
   if (!orderId.startsWith("ORD")) {
     return Response.json({ received: true });
   }
+
+  console.info("Mercado Pago webhook signature validated", {
+    orderId,
+    signatureStrategy,
+  });
 
   try {
     const mercadoPago = new MercadoPagoConfig({

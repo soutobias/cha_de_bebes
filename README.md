@@ -40,7 +40,7 @@ Configure the Mercado Pago **Order (Mercado Pago)** production webhook as `https
 
 If Mercado Pago shows a separate secret for the test environment, store it as `MERCADO_PAGO_WEBHOOK_SECRET_TEST`. Notifications with `live_mode: false` use this test secret, while production notifications use `MERCADO_PAGO_WEBHOOK_SECRET`.
 
-Webhook signature validation lowercases the alphanumeric Mercado Pago Order ID before calculating the HMAC, as required for IDs returned in uppercase such as `ORDTST...`. The original uppercase ID is preserved when retrieving the Order from the API.
+Webhook signature validation uses the `data.id`/`data_id` value from the request query when present and supports Mercado Pago's lowercase normalization for alphanumeric Order IDs. Some callback deliveries contain the Order ID only in the body and omit it from the signed manifest; those are validated without adding the body ID to the manifest. The original uppercase ID is preserved when retrieving the Order from the API.
 
 In Resend, verify `tonessa.baby` and add the requested DNS records before using the `EMAIL_FROM` address. All payment and email credentials are server-only and must never use the `NEXT_PUBLIC_` prefix.
 
