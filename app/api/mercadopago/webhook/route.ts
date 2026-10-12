@@ -5,13 +5,18 @@ import {
   WebhookSignatureValidator,
 } from "mercadopago";
 import { Resend } from "resend";
+import giftsData from "@/data/presentes.json";
+import type { Gift } from "@/lib/cart";
 
 export const runtime = "nodejs";
 
 type WebhookPayload = {
   type?: unknown;
   live_mode?: unknown;
-  data?: { id?: unknown };
+  data?: {
+    id?: unknown;
+    items?: Array<{ external_code?: unknown; quantity?: unknown }>;
+  };
 };
 
 type EmailItem = {
@@ -19,6 +24,10 @@ type EmailItem = {
   quantity: number;
   unitPrice: number;
 };
+
+const giftCatalog = new Map(
+  (giftsData as Gift[]).map((gift) => [String(gift.id), gift]),
+);
 
 function escapeHtml(value: string) {
   return value
@@ -327,13 +336,33 @@ export async function POST(request: Request) {
     }
 
     const buyerEmail = order.payer?.email?.trim().toLowerCase();
-    const items = (order.items ?? []).flatMap((item) => {
+    const orderItems = (order.items ?? []).flatMap((item) => {
       const quantity = item.quantity ?? 0;
       const unitPrice = Number(item.unit_price);
+      const catalogGift = item.external_code
+        ? giftCatalog.get(String(item.external_code))
+        : undefined;
+      const title = item.title || catalogGift?.title;
+      const resolvedUnitPrice = Number.isFinite(unitPrice)
+        ? unitPrice
+        : catalogGift?.price;
 
-      if (!item.title || quantity < 1 || !Number.isFinite(unitPrice)) return [];
-      return [{ title: item.title, quantity, unitPrice }];
+      if (!title || quantity < 1 || resolvedUnitPrice === undefined) return [];
+      return [{ title, quantity, unitPrice: resolvedUnitPrice }];
     });
+    const notificationItems = (payload.data?.items ?? []).flatMap((item) => {
+      const externalCode =
+        typeof item.external_code === "string" ||
+        typeof item.external_code === "number"
+          ? String(item.external_code)
+          : "";
+      const quantity = Number(item.quantity);
+      const gift = giftCatalog.get(externalCode);
+
+      if (!gift || !Number.isInteger(quantity) || quantity < 1) return [];
+      return [{ title: gift.title, quantity, unitPrice: gift.price }];
+    });
+    const items = orderItems.length > 0 ? orderItems : notificationItems;
 
     const isTestNotification =
       isConfiguredTestMode || payload.live_mode === false;
@@ -347,6 +376,10 @@ export async function POST(request: Request) {
         "Approved Mercado Pago order is missing recipient or items",
         {
           orderId,
+          hasOrderId: Boolean(order.id),
+          hasBuyerEmail: Boolean(buyerEmail),
+          orderItemCount: orderItems.length,
+          notificationItemCount: notificationItems.length,
         },
       );
       return Response.json({ error: "Incomplete order" }, { status: 502 });
