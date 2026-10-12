@@ -38,7 +38,7 @@ The browser stores the buyer name and email in local storage, then sends only th
 
 Configure the Mercado Pago **Order (Mercado Pago)** production webhook as `https://tonessa.baby/api/mercadopago/webhook`, then copy its secret to `MERCADO_PAGO_WEBHOOK_SECRET`. The endpoint validates Mercado Pago's signature, retrieves the Order from Mercado Pago, and sends confirmations only for a fully paid, approved Order. Resend receives separate idempotency keys for the buyer and owner messages so webhook retries do not normally produce duplicate emails.
 
-If Mercado Pago shows a separate secret for the test environment, store it as `MERCADO_PAGO_WEBHOOK_SECRET_TEST`. Notifications with `live_mode: false` use this test secret, while production notifications use `MERCADO_PAGO_WEBHOOK_SECRET`.
+If Mercado Pago shows a separate secret for the test environment, store it as `MERCADO_PAGO_WEBHOOK_SECRET_TEST`. The webhook securely tries both configured secrets because Mercado Pago simulators can report `live_mode` values that do not identify which configured secret was used. A notification is accepted only when one secret produces the expected HMAC.
 
 Webhook signature validation uses the `data.id`/`data_id` value from the request query when present and supports Mercado Pago's lowercase normalization for alphanumeric Order IDs. Some callback deliveries contain the Order ID only in the body and omit it from the signed manifest; those are validated without adding the body ID to the manifest. The original uppercase ID is preserved when retrieving the Order from the API.
 

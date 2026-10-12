@@ -54,12 +54,11 @@ function validateWebhookSignature({
   bodyDataId: string | null;
   secret: string;
 }) {
-  const candidates = queryDataId
-    ? [queryDataId.toLowerCase(), queryDataId]
-    : [
-        undefined,
-        ...(bodyDataId ? [bodyDataId.toLowerCase(), bodyDataId] : []),
-      ];
+  const candidates = [
+    ...(queryDataId ? [queryDataId.toLowerCase(), queryDataId] : []),
+    undefined,
+    ...(bodyDataId ? [bodyDataId.toLowerCase(), bodyDataId] : []),
+  ];
   const uniqueCandidates = [...new Set(candidates)];
   let lastError: unknown;
 
@@ -213,16 +212,20 @@ export async function POST(request: Request) {
   const bodyDataId =
     typeof payload.data?.id === "string" ? payload.data.id : null;
   const orderId = queryDataId || bodyDataId;
-  const webhookSecret =
-    payload.live_mode === false
-      ? testWebhookSecret || productionWebhookSecret
-      : productionWebhookSecret;
+  const secretCandidates = [
+    ...(productionWebhookSecret
+      ? [{ source: "primary", value: productionWebhookSecret }]
+      : []),
+    ...(testWebhookSecret && testWebhookSecret !== productionWebhookSecret
+      ? [{ source: "test", value: testWebhookSecret }]
+      : []),
+  ];
 
   if (!orderId) {
     return Response.json({ error: "Missing order ID" }, { status: 400 });
   }
 
-  if (!webhookSecret) {
+  if (secretCandidates.length === 0) {
     console.error("Webhook secret is not configured for this environment", {
       liveMode: payload.live_mode,
     });
@@ -232,28 +235,38 @@ export async function POST(request: Request) {
     );
   }
 
-  let signatureStrategy: string;
+  let signatureStrategy: string | undefined;
+  let signatureSecretSource: string | undefined;
+  let signatureError: unknown;
 
-  try {
-    signatureStrategy = validateWebhookSignature({
-      xSignature: request.headers.get("x-signature"),
-      xRequestId: request.headers.get("x-request-id"),
-      queryDataId,
-      bodyDataId,
-      secret: webhookSecret,
-    });
-  } catch (error) {
+  for (const secret of secretCandidates) {
+    try {
+      signatureStrategy = validateWebhookSignature({
+        xSignature: request.headers.get("x-signature"),
+        xRequestId: request.headers.get("x-request-id"),
+        queryDataId,
+        bodyDataId,
+        secret: secret.value,
+      });
+      signatureSecretSource = secret.source;
+      break;
+    } catch (error) {
+      signatureError = error;
+    }
+  }
+
+  if (!signatureStrategy || !signatureSecretSource) {
     console.error("Invalid Mercado Pago webhook signature", {
       orderId,
       liveMode: payload.live_mode,
       reason:
-        error instanceof InvalidWebhookSignatureError
-          ? error.reason
+        signatureError instanceof InvalidWebhookSignatureError
+          ? signatureError.reason
           : "unknown",
       hasSignature: Boolean(request.headers.get("x-signature")),
       hasRequestId: Boolean(request.headers.get("x-request-id")),
       hasQueryDataId: Boolean(queryDataId),
-      usedTestSecret: payload.live_mode === false && Boolean(testWebhookSecret),
+      testedSecretSources: secretCandidates.map((secret) => secret.source),
     });
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
@@ -265,6 +278,7 @@ export async function POST(request: Request) {
   console.info("Mercado Pago webhook signature validated", {
     orderId,
     signatureStrategy,
+    signatureSecretSource,
   });
 
   try {
