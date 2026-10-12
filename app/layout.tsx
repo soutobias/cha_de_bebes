@@ -21,7 +21,7 @@ const script = Parisienne({
 export const metadata: Metadata = {
   metadataBase: new URL("https://tonessa.baby"),
   title: { default: "Bebês Tonessa", template: "%s | Bebês Tonessa" },
-  description: "Duas Ervilhinhas numa Vagem -Chá de bebê dos gêmeos Tonessa.",
+  description: "Duas Ervilhinhas numa Vagem - Chá de bebê dos gêmeos Tonessa.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -29,7 +29,8 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Bebês Tonessa",
     title: "Bebês Tonessa",
-    description: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
+    description:
+      "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
     images: [
       {
         url: "/images/shared-image.png",
@@ -42,7 +43,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Bebês Tonessa",
-    description: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
+    description:
+      "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
     images: ["/images/shared-image.png"],
   },
 };

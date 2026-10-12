@@ -100,7 +100,6 @@ export function DetailsSection() {
             className="max-sm:col-span-2"
             label="Confirmação + Presentes"
             title="Confirme sua presença e veja nossa lista de presentes"
-            text=""
             image="/images/gift-icon.png"
           >
             <div className="mt-3 flex flex-wrap gap-2 justify-center">
