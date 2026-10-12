@@ -4,12 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import giftsData from "@/data/presentes.json";
-import { formatBRL, MAX_ITEM_QUANTITY, type Gift } from "@/lib/cart";
+import {
+  formatBRL,
+  MAX_ITEM_QUANTITY,
+  type CartItem,
+  type Gift,
+} from "@/lib/cart";
 import { useCart } from "./cart-provider";
 
 const gifts = giftsData as Gift[];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const BUYER_STORAGE_KEY = "cha-dos-gemeos-buyer";
+const PENDING_CHECKOUT_STORAGE_KEY = "cha-dos-gemeos-pending-checkout";
+const LAST_PURCHASE_STORAGE_KEY = "cha-dos-gemeos-last-purchase";
 
 type StoredBuyer = {
   name: string;
@@ -23,11 +30,40 @@ function isStoredBuyer(value: unknown): value is StoredBuyer {
   return typeof buyer.name === "string" && typeof buyer.email === "string";
 }
 
+function isStoredCart(value: unknown): value is CartItem[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every(
+      (item) =>
+        typeof item === "object" &&
+        item !== null &&
+        Number.isInteger((item as CartItem).id) &&
+        Number.isInteger((item as CartItem).quantity) &&
+        (item as CartItem).quantity >= 1 &&
+        (item as CartItem).quantity <= MAX_ITEM_QUANTITY,
+    )
+  );
+}
+
+function readStoredCart(key: string) {
+  try {
+    const storedValue = localStorage.getItem(key);
+    const parsedValue: unknown = storedValue ? JSON.parse(storedValue) : null;
+    return isStoredCart(parsedValue) ? parsedValue : null;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+}
+
 export function CartPage() {
-  const { items, isReady, updateQuantity, removeItem } = useCart();
+  const { items, isReady, updateQuantity, removeItem, clearCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState("");
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [purchasedItems, setPurchasedItems] = useState<CartItem[] | null>(null);
+  const [isPaymentReturnReady, setIsPaymentReturnReady] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [hasTouchedName, setHasTouchedName] = useState(false);
@@ -41,14 +77,34 @@ export function CartPage() {
   const isEmailValid = EMAIL_PATTERN.test(normalizedEmail);
 
   useEffect(() => {
+    if (!isReady) return;
+
+    const status = new URLSearchParams(window.location.search).get("status");
+    let purchase: CartItem[] | null = null;
+
+    if (status === "success") {
+      const pendingCheckout = readStoredCart(PENDING_CHECKOUT_STORAGE_KEY);
+      purchase = pendingCheckout ?? readStoredCart(LAST_PURCHASE_STORAGE_KEY);
+
+      if (purchase) {
+        localStorage.setItem(
+          LAST_PURCHASE_STORAGE_KEY,
+          JSON.stringify(purchase),
+        );
+      }
+
+      localStorage.removeItem(PENDING_CHECKOUT_STORAGE_KEY);
+    }
+
     const timeout = window.setTimeout(() => {
-      setPaymentStatus(
-        new URLSearchParams(window.location.search).get("status"),
-      );
+      if (purchase) setPurchasedItems(purchase);
+      if (status === "success") clearCart();
+      setPaymentStatus(status);
+      setIsPaymentReturnReady(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [clearCart, isReady]);
 
   useEffect(() => {
     let storedBuyer: StoredBuyer | null = null;
@@ -96,6 +152,20 @@ export function CartPage() {
     0,
   );
 
+  const purchasedLines = useMemo(
+    () =>
+      (purchasedItems ?? []).flatMap((item) => {
+        const gift = gifts.find((candidate) => candidate.id === item.id);
+        return gift ? [{ ...gift, quantity: item.quantity }] : [];
+      }),
+    [purchasedItems],
+  );
+
+  const purchasedTotal = purchasedLines.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
   async function checkout(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setHasTouchedName(true);
@@ -124,6 +194,7 @@ export function CartPage() {
         );
       }
 
+      localStorage.setItem(PENDING_CHECKOUT_STORAGE_KEY, JSON.stringify(items));
       window.location.assign(result.checkoutUrl);
     } catch (checkoutError) {
       setError(
@@ -135,10 +206,74 @@ export function CartPage() {
     }
   }
 
-  if (!isReady) {
+  if (!isReady || !isPaymentReturnReady) {
     return (
       <div className="grid min-h-80 place-items-center text-muted">
         Carregando carrinho…
+      </div>
+    );
+  }
+
+  if (paymentStatus === "success" && purchasedLines.length > 0) {
+    return (
+      <div className="mx-auto max-w-3xl">
+        <div className="mb-5 rounded-2xl border border-forest/15 bg-[#edf0d3]/90 px-5 py-4 text-center text-forest">
+          <h2 className="font-display text-3xl font-semibold">
+            Obrigado pelo carinho!
+          </h2>
+          <p className="mt-1 text-sm">
+            Estes foram os presentes comprados. A confirmação também será
+            enviada por e-mail.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {purchasedLines.map((item) => (
+            <article
+              className="flex items-center gap-5 rounded-2xl border border-forest/15 bg-paper/90 p-4 shadow-[0_12px_35px_rgba(54,84,59,.07)]"
+              key={item.id}
+            >
+              <div className="relative size-24 shrink-0 overflow-hidden rounded-xl bg-[#edf0d3] max-sm:size-20">
+                <Image
+                  src={item.image}
+                  alt=""
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-display text-2xl font-semibold text-forest max-sm:text-xl">
+                  {item.title}
+                </h3>
+                <p className="mt-1 text-sm text-muted">
+                  {item.quantity} {item.quantity === 1 ? "unidade" : "unidades"}
+                </p>
+                <p className="mt-1 text-sm font-bold text-moss sm:hidden">
+                  {formatBRL(item.price * item.quantity)}
+                </p>
+              </div>
+              <strong className="shrink-0 text-sm text-forest max-sm:hidden">
+                {formatBRL(item.price * item.quantity)}
+              </strong>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-5 rounded-3xl border border-forest/15 bg-paper/90 p-6 text-center shadow-[0_18px_50px_rgba(54,84,59,.1)]">
+          <div className="mb-5 flex items-center justify-between border-b border-forest/10 pb-4 text-muted">
+            <span>Total da compra</span>
+            <strong className="text-lg text-forest">
+              {formatBRL(purchasedTotal)}
+            </strong>
+          </div>
+          <Link
+            className="inline-flex rounded-full bg-forest px-7 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f]"
+            href="/presentes"
+          >
+            Fazer uma nova compra
+          </Link>
+        </div>
       </div>
     );
   }
