@@ -55,8 +55,10 @@ export default function PresentesPage() {
             />
           </div>
           <p className="leading-7 text-muted pt-5">
-            Sua presença já é o nosso maior presente. Mas, se quiser mimar os
-            gêmeos, separamos algumas sugestões.
+            Como os papais moram do outro lado do oceano, seria muito difícil
+            levar todos os presentes do Brasil. Por isso, criamos essa lista
+            virtual. Os valores serão convertidos em dinheiro e utilizados pelos
+            papais para compra dos presentes.
           </p>
         </div>
         <GiftList gifts={gifts as Gift[]} />

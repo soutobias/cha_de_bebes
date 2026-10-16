@@ -20,7 +20,7 @@ const details = [
   {
     label: "Local",
     title: "Rua Spix, 157 - Ponta Grossa/PR",
-    text: "Casa da vó Nadir",
+    text: "Casa da Vó Nadyr",
     image: "/images/marker-icon.png",
     mapUrl:
       "https://www.google.com/maps/search/?api=1&query=Rua+Spix%2C+157%2C+Ponta+Grossa%2C+PR",

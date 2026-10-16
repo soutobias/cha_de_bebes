@@ -4,7 +4,20 @@ export const metadata: Metadata = { title: "Confirmação" };
 export default function ConfirmacaoPage() {
   const formUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
   return (
-    <section className="min-h-svh opacity-50 bg-[url('/images/banner.png')] bg-cover bg-center bg-fixed pt-28 pb-23 max-sm:bg-[url('/images/banner-mobile.png')] max-sm:bg-scroll max-sm:pt-[calc(5rem+env(safe-area-inset-top))] max-sm:pb-17">
+    <section
+      className="
+    relative isolate min-h-svh
+    before:absolute before:inset-0 before:-z-10
+    before:bg-[url('/images/banner.png')]
+    before:bg-cover before:bg-center before:bg-fixed
+    before:opacity-50
+    max-sm:before:bg-[url('/images/banner-mobile.png')]
+    max-sm:before:bg-scroll
+    pt-28 pb-23
+    max-sm:pt-[calc(5rem+env(safe-area-inset-top))]
+    max-sm:pb-17
+  "
+    >
       <div className="mx-auto w-[min(940px,calc(100%-40px))] max-sm:w-[calc(100%-28px)]">
         <div className="mx-auto max-w-170 text-center">
           <div className="mx-auto flex items-center max-w-100 justify-center gap-4 max-sm:gap-1">
@@ -41,7 +54,7 @@ export default function ConfirmacaoPage() {
         <div className="min-h-130 rounded-3xl border border-forest/15 bg-paper/85 p-2.5 shadow-[0_24px_70px_rgba(54,84,59,.1)] max-sm:p-1.5">
           {formUrl ? (
             <iframe
-              className="block h-270 w-full rounded-[17px] border-0 bg-white"
+              className="block h-150 w-full rounded-[17px] border-0 bg-white"
               src={formUrl}
               title="Formulário de confirmação de presença"
               loading="lazy"

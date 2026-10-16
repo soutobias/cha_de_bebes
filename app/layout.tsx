@@ -33,9 +33,9 @@ export const metadata: Metadata = {
       "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
     images: [
       {
-        url: "/images/shared-image.png",
-        width: 1902,
-        height: 914,
+        url: "/images/shared-image.png?v=2",
+        width: 1200,
+        height: 630,
         alt: "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa",
       },
     ],
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     title: "Bebês Tonessa",
     description:
       "Duas Ervilhinhas numa Vagem — Chá de bebê dos gêmeos Tonessa.",
-    images: ["/images/shared-image.png"],
+    images: ["/images/shared-image.png?v=2"],
   },
 };
 

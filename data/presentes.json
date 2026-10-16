@@ -1,21 +1,5 @@
 [
   {
-    "id": 1,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos.png",
-    "title": "Kit de fraldas",
-    "description": "Fraldas são sempre bem-vindas para acompanhar cada nova descoberta.",
-    "price": 150,
-    "link": "https://www.amazon.com.br/s?k=fraldas+recem+nascido"
-  },
-  {
-    "id": 2,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (1).png",
-    "title": "Roupinhas confortáveis",
-    "description": "Bodies e macacões macios para os primeiros meses dos pequenos.",
-    "price": 120,
-    "link": "https://www.amazon.com.br/s?k=roupa+bebe+recem+nascido"
-  },
-  {
     "id": 3,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (2).png",
     "title": "Hora do banho",
@@ -32,19 +16,11 @@
     "link": "https://www.amazon.com.br/s?k=manta+cueiro+bebe"
   },
   {
-    "id": 5,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (4).png",
-    "title": "Livros para o quartinho",
-    "description": "Histórias doces para criar memórias desde os primeiros dias.",
-    "price": 80,
-    "link": "https://www.amazon.com.br/s?k=livros+para+bebes"
-  },
-  {
     "id": 7,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (6).png",
     "title": "Kit de fraldas RN",
     "description": "Para os primeiros dias dos pequenos, com muito carinho e praticidade.",
-    "price": 80,
+    "price": 60,
     "link": "https://www.amazon.com.br/s?k=fraldas+recem+nascido"
   },
   {
@@ -52,7 +28,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (7).png",
     "title": "Kit de fraldas P",
     "description": "Um reforço importante para a rotina dos primeiros meses dos gêmeos.",
-    "price": 90,
+    "price": 70,
     "link": "https://www.amazon.com.br/s?k=fraldas+bebe+tamanho+p"
   },
   {
@@ -60,7 +36,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (8).png",
     "title": "Kit de fraldas M",
     "description": "Fraldas para acompanhar uma fase de muito crescimento e descobertas.",
-    "price": 100,
+    "price": 80,
     "link": "https://www.amazon.com.br/s?k=fraldas+bebe+tamanho+m"
   },
   {
@@ -68,7 +44,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (9).png",
     "title": "Kit de fraldas G",
     "description": "Um presente útil para deixar o estoque preparado para os próximos meses.",
-    "price": 110,
+    "price": 90,
     "link": "https://www.amazon.com.br/s?k=fraldas+bebe+tamanho+g"
   },
   {
@@ -88,14 +64,6 @@
     "link": "https://www.amazon.com.br/s?k=pomada+assadura+bebe"
   },
   {
-    "id": 13,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (12).png",
-    "title": "Algodão e hastes flexíveis para bebê",
-    "description": "Pequenos itens que fazem diferença na organização dos cuidados diários.",
-    "price": 25,
-    "link": "https://www.amazon.com.br/s?k=algodao+bebe+hastes+flexiveis"
-  },
-  {
     "id": 14,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (13).png",
     "title": "Trocador portátil",
@@ -108,7 +76,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (14).png",
     "title": "Lixeira para fraldas",
     "description": "Ajuda a manter o cantinho das trocas mais organizado e prático.",
-    "price": 220,
+    "price": 120,
     "link": "https://www.amazon.com.br/s?k=lixeira+fraldas+bebe"
   },
   {
@@ -156,7 +124,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (20).png",
     "title": "Babadores",
     "description": "Com dois bebês, babadores extras são sempre bem-vindos nas refeições.",
-    "price": 50,
+    "price": 30,
     "link": "https://www.amazon.com.br/s?k=babador+bebe"
   },
   {
@@ -164,7 +132,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (21).png",
     "title": "Panos de boca",
     "description": "Essenciais para ter sempre à mão durante mamadas e passeios.",
-    "price": 50,
+    "price": 40,
     "link": "https://www.amazon.com.br/s?k=pano+de+boca+bebe"
   },
   {
@@ -172,7 +140,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (22).png",
     "title": "Fraldas de pano",
     "description": "Versáteis para apoio, ombro, trocas e muitos momentos da rotina.",
-    "price": 60,
+    "price": 70,
     "link": "https://www.amazon.com.br/s?k=fralda+de+pano+bebe"
   },
   {
@@ -192,44 +160,12 @@
     "link": "https://www.amazon.com.br/s?k=saco+de+dormir+bebe"
   },
   {
-    "id": 26,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (25).png",
-    "title": "Organizadores de gaveta",
-    "description": "Para deixar roupinhas, fraldas e acessórios dos gêmeos sempre à mão.",
-    "price": 70,
-    "link": "https://www.amazon.com.br/s?k=organizador+gaveta+bebe"
-  },
-  {
     "id": 27,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (26).png",
     "title": "Kit de mamadeiras",
     "description": "Mamadeiras de diferentes tamanhos para acompanhar cada fase dos bebês.",
-    "price": 150,
+    "price": 120,
     "link": "https://www.amazon.com.br/s?k=kit+mamadeiras+bebe"
-  },
-  {
-    "id": 28,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (27).png",
-    "title": "Escova para mamadeiras",
-    "description": "Ajuda na limpeza diária das mamadeiras e acessórios de alimentação.",
-    "price": 35,
-    "link": "https://www.amazon.com.br/s?k=escova+mamadeira+bebe"
-  },
-  {
-    "id": 29,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (28).png",
-    "title": "Escorredor para mamadeiras",
-    "description": "Um cantinho prático para secar mamadeiras, bicos e pequenos acessórios.",
-    "price": 80,
-    "link": "https://www.amazon.com.br/s?k=escorredor+mamadeira+bebe"
-  },
-  {
-    "id": 30,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (29).png",
-    "title": "Aquecedor de mamadeiras",
-    "description": "Ajuda a tornar as mamadas noturnas e a rotina em dobro mais práticas.",
-    "price": 200,
-    "link": "https://www.amazon.com.br/s?k=aquecedor+mamadeira+bebe"
   },
   {
     "id": 31,
@@ -244,7 +180,7 @@
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (50).png",
     "title": "Almofada de amamentação para gêmeos",
     "description": "Mais apoio e conforto para alimentar os dois pequenos.",
-    "price": 350,
+    "price": 250,
     "link": "https://www.amazon.com.br/s?k=almofada+amamentacao+gemeos"
   },
   {
@@ -256,30 +192,6 @@
     "link": "https://www.amazon.com.br/s?k=bomba+tira+leite+eletrica"
   },
   {
-    "id": 34,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (53).png",
-    "title": "Bomba tira-leite elétrica dupla",
-    "description": "Uma opção mais completa para tornar a extração mais eficiente na rotina com gêmeos.",
-    "price": 600,
-    "link": "https://www.amazon.com.br/s?k=bomba+tira+leite+eletrica+dupla"
-  },
-  {
-    "id": 35,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (54).png",
-    "title": "Bolsas para armazenar leite",
-    "description": "Praticidade para organizar pequenas reservas de leite materno.",
-    "price": 70,
-    "link": "https://www.amazon.com.br/s?k=saco+armazenamento+leite+materno"
-  },
-  {
-    "id": 36,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (55).png",
-    "title": "Kit de potes para leite e papinhas",
-    "description": "Para armazenar porções e facilitar a rotina quando chegar a introdução alimentar.",
-    "price": 90,
-    "link": "https://www.amazon.com.br/s?k=potes+papinha+bebe"
-  },
-  {
     "id": 37,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (56).png",
     "title": "Duas cadeiras de alimentação",
@@ -288,26 +200,10 @@
     "link": "https://www.amazon.com.br/s?k=cadeira+alimentacao+bebe"
   },
   {
-    "id": 38,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (57).png",
-    "title": "Kit de pratos e talheres",
-    "description": "Utensílios infantis para quando os gêmeos começarem novas aventuras à mesa.",
-    "price": 120,
-    "link": "https://www.amazon.com.br/s?k=kit+alimentacao+bebe+prato+talher"
-  },
-  {
     "id": 41,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (30).png",
     "title": "Colchão de berço",
     "description": "Conforto para completar o espaço de descanso de um dos pequenos.",
-    "price": 250,
-    "link": "https://www.amazon.com.br/s?k=colchao+berco+bebe"
-  },
-  {
-    "id": 42,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (31).png",
-    "title": "Segundo colchão de berço",
-    "description": "Para deixar os dois cantinhos de descanso igualmente preparados.",
     "price": 250,
     "link": "https://www.amazon.com.br/s?k=colchao+berco+bebe"
   },
@@ -328,22 +224,6 @@
     "link": "https://www.amazon.com.br/s?k=baba+eletronica+bebe"
   },
   {
-    "id": 48,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (37).png",
-    "title": "Máquina de ruído branco",
-    "description": "Um som suave para ajudar a criar uma rotina tranquila no quartinho.",
-    "price": 150,
-    "link": "https://www.amazon.com.br/s?k=maquina+ruido+branco+bebe"
-  },
-  {
-    "id": 49,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (38).png",
-    "title": "Umidificador de ar",
-    "description": "Um item útil para deixar o ambiente do quartinho mais confortável.",
-    "price": 180,
-    "link": "https://www.amazon.com.br/s?k=umidificador+ar+bebe"
-  },
-  {
     "id": 50,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (39).png",
     "title": "Banheira para bebê",
@@ -352,28 +232,12 @@
     "link": "https://www.amazon.com.br/s?k=banheira+bebe"
   },
   {
-    "id": 51,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (40).png",
-    "title": "Termômetro digital",
-    "description": "Um item essencial para ter sempre por perto nos cuidados com os pequenos.",
-    "price": 80,
-    "link": "https://www.amazon.com.br/s?k=termometro+digital+bebe"
-  },
-  {
     "id": 52,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (41).png",
     "title": "Kit de primeiros cuidados",
     "description": "Termômetro, aspirador nasal, cortador de unhas e outros itens úteis para o dia a dia.",
     "price": 120,
     "link": "https://www.amazon.com.br/s?k=kit+cuidados+bebe+termometro+aspirador"
-  },
-  {
-    "id": 53,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (42).png",
-    "title": "Mochila maternidade grande",
-    "description": "Espaço extra para organizar tudo o que dois bebês precisam fora de casa.",
-    "price": 250,
-    "link": "https://www.amazon.com.br/s?k=mochila+maternidade+gemeos"
   },
   {
     "id": 54,
@@ -400,19 +264,11 @@
     "link": "https://www.amazon.com.br/s?k=bebe+conforto"
   },
   {
-    "id": 57,
-    "image": "/images/carrinho_cha_de_bebe/cart-gemeos (46).png",
-    "title": "Segundo bebê conforto",
-    "description": "Para que os dois bebês possam viajar com segurança desde os primeiros passeios.",
-    "price": 450,
-    "link": "https://www.amazon.com.br/s?k=bebe+conforto"
-  },
-  {
     "id": 58,
     "image": "/images/carrinho_cha_de_bebe/cart-gemeos (48).png",
     "title": "Carrinho para gêmeos",
     "description": "Um presentão para os passeios em família e para tornar a rotina com dois bebês mais prática.",
-    "price": 1800,
+    "price": 800,
     "link": "https://www.amazon.com.br/s?k=carrinho+gemeos"
   },
   {
