@@ -222,8 +222,8 @@ export function CartPage() {
             Obrigado pelo carinho!
           </h2>
           <p className="mt-1 text-sm">
-            Estes foram os presentes comprados. A confirmação também será
-            enviada por e-mail.
+            Se seu pagamento foi efetuado com sucesso,
+            você receberá um email de confirmação.
           </p>
         </div>
 
