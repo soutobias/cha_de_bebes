@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DetailCard } from "./detail-card";
+import type { SiteVariant } from "@/lib/site-config";
+import { UK_CONFIRMATION_URL } from "@/lib/site-config";
 
-const details = [
+const brazilDetails = [
   {
     label: "Data",
     title: "07 de Novembro de 2026",
@@ -27,7 +29,38 @@ const details = [
   },
 ];
 
-export function DetailsSection() {
+const ukDetails = [
+  {
+    label: "Data",
+    title: "28 de Novembro de 2026",
+    text: "Sábado",
+    image: "/images/calendar-icon.png",
+    mapUrl: null,
+  },
+  {
+    label: "Horário",
+    title: "A partir das 15h",
+    text: "Esperamos você",
+    image: "/images/relogio-icon.png",
+    mapUrl: null,
+  },
+  {
+    label: "Local",
+    title: "84 Hill Street, L8 5UL",
+    text: "Liverpool UK",
+    image: "/images/marker-icon.png",
+    mapUrl:
+      "https://www.google.com/maps/search/?api=1&query=84+Hill+St,+Liverpool+L8+5UL",
+  },
+];
+
+export function DetailsSection({
+  siteVariant = "br",
+}: {
+  siteVariant?: SiteVariant;
+}) {
+  const details = siteVariant === "uk" ? ukDetails : brazilDetails;
+
   return (
     <section
       className="
@@ -105,7 +138,11 @@ export function DetailsSection() {
             <div className="mt-3 flex flex-wrap gap-2 justify-center">
               <Link
                 className="rounded-full bg-forest px-3.5 py-2 text-xs font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f]"
-                href="/confirmacao"
+                href={
+                  siteVariant === "uk" ? UK_CONFIRMATION_URL : "/confirmacao"
+                }
+                target={siteVariant === "uk" ? "_blank" : undefined}
+                rel={siteVariant === "uk" ? "noopener noreferrer" : undefined}
               >
                 Confirmar presença
               </Link>

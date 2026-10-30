@@ -4,6 +4,7 @@ import { CartProvider } from "@/components/cart/cart-provider";
 import { FloatingCart } from "@/components/cart/floating-cart";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { getSiteVariant } from "@/lib/get-site-variant";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -49,18 +50,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const siteVariant = await getSiteVariant();
+  const isUkSite = siteVariant === "uk";
+
   return (
     <html
       lang="pt-BR"
       className={`${display.variable} ${sans.variable} ${script.variable}`}
     >
       <body className="m-0 bg-cream font-sans text-ink antialiased">
-        <CartProvider>
+        <CartProvider enabled={!isUkSite}>
           <Header />
           <main>{children}</main>
           <Footer />
-          <FloatingCart />
+          <FloatingCart enabled={!isUkSite} />
         </CartProvider>
       </body>
     </html>

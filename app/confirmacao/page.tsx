@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { UK_CONFIRMATION_URL } from "@/lib/site-config";
+import { getSiteVariant } from "@/lib/get-site-variant";
 export const metadata: Metadata = { title: "Confirmação" };
-export default function ConfirmacaoPage() {
-  const formUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
+export default async function ConfirmacaoPage() {
+  const siteVariant = await getSiteVariant();
+  const formUrl =
+    siteVariant === "uk"
+      ? UK_CONFIRMATION_URL
+      : process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
   return (
     <section
       className="

@@ -8,7 +8,7 @@ import { useCart } from "./cart-provider";
 
 type Position = { x: number; y: number };
 
-export function FloatingCart() {
+export function FloatingCart({ enabled = true }: { enabled?: boolean }) {
   const pathname = usePathname();
   const { itemCount, attentionVersion, isReady } = useCart();
   const [position, setPosition] = useState<Position | null>(null);
@@ -20,7 +20,8 @@ export function FloatingCart() {
     moved: false,
   });
 
-  if (pathname === "/carrinho" || !isReady || itemCount === 0) return null;
+  if (!enabled || pathname === "/carrinho" || !isReady || itemCount === 0)
+    return null;
 
   function handlePointerDown(event: PointerEvent<HTMLAnchorElement>) {
     const rect = event.currentTarget.getBoundingClientRect();

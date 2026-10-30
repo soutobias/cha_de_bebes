@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { CartPage } from "@/components/cart/cart-page";
 import Image from "next/image";
+import { getSiteVariant } from "@/lib/get-site-variant";
 
 export const metadata: Metadata = { title: "Carrinho" };
 
-export default function CarrinhoPage() {
+export default async function CarrinhoPage() {
+  const isUkSite = (await getSiteVariant()) === "uk";
+
   return (
     <section
       className="
@@ -49,7 +52,19 @@ export default function CarrinhoPage() {
             />
           </div>
         </div>
-        <CartPage />
+        {isUkSite ? (
+          <div className="mx-auto max-w-2xl rounded-3xl border border-forest/15 bg-paper/85 p-10 text-center shadow-[0_24px_70px_rgba(54,84,59,.1)]">
+            <h1 className="font-display text-3xl text-forest">
+              Carrinho indisponível
+            </h1>
+            <p className="mt-3 text-muted">
+              Para este evento, os presentes estão disponíveis na lista da
+              Amazon UK.
+            </p>
+          </div>
+        ) : (
+          <CartPage />
+        )}
       </div>
     </section>
   );

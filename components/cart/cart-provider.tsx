@@ -39,12 +39,20 @@ function isStoredCart(value: unknown): value is CartItem[] {
   );
 }
 
-export function CartProvider({ children }: { children: ReactNode }) {
+export function CartProvider({
+  children,
+  enabled = true,
+}: {
+  children: ReactNode;
+  enabled?: boolean;
+}) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [attentionVersion, setAttentionVersion] = useState(0);
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(enabled);
 
   useEffect(() => {
+    if (!enabled) return;
+
     let storedItems: CartItem[] = [];
 
     try {
@@ -64,13 +72,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
-    if (isReady) {
+    if (enabled && isReady) {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
     }
-  }, [isReady, items]);
+  }, [enabled, isReady, items]);
 
   const addItem = useCallback((id: number, quantity: number) => {
     const safeQuantity = Math.min(

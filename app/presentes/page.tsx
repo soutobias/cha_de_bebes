@@ -3,8 +3,11 @@ import Image from "next/image";
 import gifts from "@/data/presentes.json";
 import { GiftList } from "@/components/gifts/gift-list";
 import type { Gift } from "@/lib/cart";
+import { getSiteVariant } from "@/lib/get-site-variant";
 export const metadata: Metadata = { title: "Presentes" };
-export default function PresentesPage() {
+export default async function PresentesPage() {
+  const siteVariant = await getSiteVariant();
+
   return (
     <section
       className="
@@ -54,14 +57,27 @@ export default function PresentesPage() {
               aria-hidden="true"
             />
           </div>
-          <p className="leading-7 text-muted pt-5">
-            Como os papais moram do outro lado do oceano, seria muito difícil
-            levar todos os presentes do Brasil. Por isso, criamos essa lista
-            virtual. Os valores serão convertidos em dinheiro e utilizados pelos
-            papais para compra dos presentes.
-          </p>
+          {siteVariant === "uk" ? (
+            <div className="space-y-4 pt-5 leading-7 text-muted">
+              <p>
+                Preparamos com muito carinho uma lista de chá de bebê na Amazon
+                com alguns itens que vão nos ajudar a receber nossos pequenos!
+              </p>
+              <p>
+                Agradecemos de coração por todo o carinho e por fazer parte
+                desse momento tão especial das nossas vidas! 🫛🫛
+              </p>
+            </div>
+          ) : (
+            <p className="pt-5 leading-7 text-muted">
+              Como os papais moram do outro lado do oceano, seria muito difícil
+              levar todos os presentes do Brasil. Por isso, criamos essa lista
+              virtual. Os valores serão convertidos em dinheiro e utilizados
+              pelos papais para compra dos presentes.
+            </p>
+          )}
         </div>
-        <GiftList gifts={gifts as Gift[]} />
+        <GiftList gifts={gifts as Gift[]} siteVariant={siteVariant} />
       </div>
     </section>
   );

@@ -16,6 +16,11 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+The UK version is selected by the hostname. While running the development
+server, open [http://uk.localhost:3000](http://uk.localhost:3000) to preview
+the UK content locally. The `uk.localhost` hostname resolves to the local
+machine in modern browsers.
+
 ## Mercado Pago Checkout Pro
 
 Copy `.env.example` to `.env.local` and configure:
