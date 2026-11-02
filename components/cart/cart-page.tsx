@@ -222,8 +222,9 @@ export function CartPage() {
             Obrigado pelo carinho!
           </h2>
           <p className="mt-1 text-sm">
-            Se seu pagamento foi efetuado com sucesso,
-            você receberá um email de confirmação.
+            Você receberá um e-mail do Mercado Pago com a confirmação caso
+            seu pagamento tenha sido efetuado com sucesso. Confira abaixo os
+            itens escolhidos.
           </p>
         </div>
 
@@ -310,7 +311,7 @@ export function CartPage() {
         {paymentStatus && (
           <div className="rounded-2xl border border-forest/15 bg-[#edf0d3]/80 px-5 py-4 text-sm text-forest">
             {paymentStatus === "success"
-              ? "Pagamento concluído! Enviaremos por e-mail a confirmação do presente assim que o Mercado Pago confirmar o processamento. Obrigado pelo carinho!"
+              ? "Confira abaixo os itens escolhidos. Se o pagamento foi efetuado com sucesso, você receberá um e-mail de confirmação do Mercado Pago. Obrigado pelo carinho!"
               : paymentStatus === "pending"
                 ? "O Mercado Pago está processando o pagamento."
                 : "O pagamento não foi concluído. Você pode tentar novamente."}

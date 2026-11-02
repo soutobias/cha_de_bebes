@@ -189,7 +189,6 @@ export async function POST(request: Request) {
   const resendApiKey = process.env.RESEND_API_KEY;
   const emailFrom = process.env.EMAIL_FROM;
   const notificationEmail = process.env.NOTIFICATION_EMAIL;
-  const testEmailRecipient = process.env.EMAIL_TEST_RECIPIENT?.trim();
   const isConfiguredTestMode = process.env.MERCADO_PAGO_TEST_MODE === "true";
   if (
     !accessToken ||
@@ -364,40 +363,18 @@ export async function POST(request: Request) {
     });
     const items = orderItems.length > 0 ? orderItems : notificationItems;
 
-    const isTestNotification =
-      isConfiguredTestMode || payload.live_mode === false;
-
-    if (
-      (!buyerEmail && !(isTestNotification && testEmailRecipient)) ||
-      items.length === 0 ||
-      !order.id
-    ) {
-      console.error(
-        "Approved Mercado Pago order is missing recipient or items",
-        {
-          orderId,
-          hasOrderId: Boolean(order.id),
-          hasBuyerEmail: Boolean(buyerEmail),
-          orderItemCount: orderItems.length,
-          notificationItemCount: notificationItems.length,
-        },
-      );
+    if (items.length === 0 || !order.id) {
+      console.error("Approved Mercado Pago order is missing required data", {
+        orderId,
+        hasOrderId: Boolean(order.id),
+        hasBuyerEmail: Boolean(buyerEmail),
+        orderItemCount: orderItems.length,
+        notificationItemCount: notificationItems.length,
+      });
       return Response.json({ error: "Incomplete order" }, { status: 502 });
     }
 
-    const buyerRecipient =
-      isTestNotification && testEmailRecipient
-        ? testEmailRecipient
-        : buyerEmail!;
     const total = totalInCents / 100;
-    const buyerContent = createEmailContent({
-      heading: "Pagamento confirmado 💚",
-      introduction:
-        "Recebemos seu presente para as duas ervilhinhas. Muito obrigado pelo carinho!",
-      orderId: order.id,
-      items,
-      total,
-    });
     const ownerContent = createEmailContent({
       heading: "Um novo presente foi recebido",
       introduction:
@@ -409,31 +386,19 @@ export async function POST(request: Request) {
     });
     const resend = new Resend(resendApiKey);
 
-    const [buyerResult, ownerResult] = await Promise.all([
-      resend.emails.send(
-        {
-          from: emailFrom,
-          to: buyerRecipient,
-          subject: "Pagamento confirmado — Chá das duas ervilhinhas",
-          ...buyerContent,
-        },
-        { idempotencyKey: `mercadopago/${order.id}/buyer` },
-      ),
-      resend.emails.send(
-        {
-          from: emailFrom,
-          to: notificationEmail,
-          subject: `Novo presente recebido — ${formatBRL(total)}`,
-          ...ownerContent,
-        },
-        { idempotencyKey: `mercadopago/${order.id}/owner` },
-      ),
-    ]);
+    const ownerResult = await resend.emails.send(
+      {
+        from: emailFrom,
+        to: notificationEmail,
+        subject: `Novo presente recebido — ${formatBRL(total)}`,
+        ...ownerContent,
+      },
+      { idempotencyKey: `mercadopago/${order.id}/owner` },
+    );
 
-    if (buyerResult.error || ownerResult.error) {
+    if (ownerResult.error) {
       console.error("Resend failed to send payment confirmation", {
         orderId,
-        buyerError: buyerResult.error?.name,
         ownerError: ownerResult.error?.name,
       });
       return Response.json({ error: "Email delivery failed" }, { status: 502 });
