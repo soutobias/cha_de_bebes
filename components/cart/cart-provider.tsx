@@ -48,7 +48,7 @@ export function CartProvider({
 }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [attentionVersion, setAttentionVersion] = useState(0);
-  const [isReady, setIsReady] = useState(enabled);
+  const [isReady, setIsReady] = useState(!enabled);
 
   useEffect(() => {
     if (!enabled) return;
@@ -126,7 +126,10 @@ export function CartProvider({
     setItems((currentItems) => currentItems.filter((item) => item.id !== id));
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    localStorage.setItem(CART_STORAGE_KEY, "[]");
+    setItems([]);
+  }, []);
 
   const value = useMemo(
     () => ({

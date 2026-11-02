@@ -444,7 +444,7 @@ export async function POST(request: Request) {
       ? createEmailContent({
           heading: "Pedido efetuado 💚",
           introduction:
-            "Caso o pagamento seja confirmado, você receberá uma confirmação do Mercado Pago. Muito obrigado pelo carinho!",
+            "Caso o pagamento seja confirmado, você receberá um email do Mercado Pago. Muito obrigado pelo carinho!",
           orderId: order.id,
           items,
           total,
