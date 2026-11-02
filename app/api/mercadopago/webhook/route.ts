@@ -355,9 +355,7 @@ export async function POST(request: Request) {
 
     const tokenEmail = buyerToken
       ? secretCandidates
-          .map((secret) =>
-            decryptPaymentEmail(buyerToken, secret.value),
-          )
+          .map((secret) => decryptPaymentEmail(buyerToken, secret.value))
           .map(normalizeEmail)
           .find((email) => email !== undefined)
       : undefined;
@@ -444,9 +442,9 @@ export async function POST(request: Request) {
     const resend = new Resend(resendApiKey);
     const buyerContent = buyerEmail
       ? createEmailContent({
-          heading: "Pagamento confirmado 💚",
+          heading: "Pedido efetuado 💚",
           introduction:
-            "Recebemos seu presente para as duas ervilhinhas. Muito obrigado pelo carinho!",
+            "Caso o pagamento seja confirmado, você receberá uma confirmação do Mercado Pago. Muito obrigado pelo carinho!",
           orderId: order.id,
           items,
           total,
