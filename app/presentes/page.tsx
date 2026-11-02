@@ -24,7 +24,7 @@ export default async function PresentesPage() {
     before:bg-cover
     before:bg-center
     before:bg-fixed
-    before:opacity-50
+    before:opacity-40
 
     max-sm:before:bg-[url('/images/banner-details-mobile.png')]
     max-sm:before:bg-fixed

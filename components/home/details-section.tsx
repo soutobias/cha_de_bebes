@@ -75,7 +75,7 @@ export function DetailsSection({
     before:bg-[url('/images/banner-detalhes2.png')]
     before:bg-cover
     before:bg-center
-    before:opacity-50
+    before:opacity-40
 
     max-sm:before:bg-[url('/images/banner-details-mobile.png')]
   "

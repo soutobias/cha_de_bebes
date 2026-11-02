@@ -2,6 +2,7 @@ import {
   InvalidWebhookSignatureError,
   MercadoPagoConfig,
   Order,
+  Payment,
   WebhookSignatureValidator,
 } from "mercadopago";
 import { Resend } from "resend";
@@ -16,6 +17,11 @@ type WebhookPayload = {
   data?: {
     id?: unknown;
     items?: Array<{ external_code?: unknown; quantity?: unknown }>;
+    transactions?: {
+      payments?: Array<{
+        reference?: { id?: unknown };
+      }>;
+    };
   };
 };
 
@@ -28,6 +34,14 @@ type EmailItem = {
 const giftCatalog = new Map(
   (giftsData as Gift[]).map((gift) => [String(gift.id), gift]),
 );
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function normalizeEmail(value: unknown) {
+  if (typeof value !== "string") return undefined;
+
+  const email = value.trim().toLowerCase();
+  return email.length <= 254 && EMAIL_PATTERN.test(email) ? email : undefined;
+}
 
 function escapeHtml(value: string) {
   return value
@@ -334,7 +348,25 @@ export async function POST(request: Request) {
       return Response.json({ received: true, emailSent: false });
     }
 
-    const buyerEmail = order.payer?.email?.trim().toLowerCase();
+    let buyerEmail = normalizeEmail(order.payer?.email);
+
+    if (!buyerEmail) {
+      const paymentReferenceId = payload.data?.transactions?.payments?.find(
+        (payment) =>
+          typeof payment.reference?.id === "string" ||
+          typeof payment.reference?.id === "number",
+      )?.reference?.id;
+
+      if (
+        typeof paymentReferenceId === "string" ||
+        typeof paymentReferenceId === "number"
+      ) {
+        const payment = await new Payment(mercadoPago).get({
+          id: paymentReferenceId,
+        });
+        buyerEmail = normalizeEmail(payment.payer?.email);
+      }
+    }
     const orderItems = (order.items ?? []).flatMap((item) => {
       const quantity = item.quantity ?? 0;
       const unitPrice = Number(item.unit_price);
@@ -385,21 +417,50 @@ export async function POST(request: Request) {
       total,
     });
     const resend = new Resend(resendApiKey);
+    const buyerContent = buyerEmail
+      ? createEmailContent({
+          heading: "Pagamento confirmado 💚",
+          introduction:
+            "Recebemos seu presente para as duas ervilhinhas. Muito obrigado pelo carinho!",
+          orderId: order.id,
+          items,
+          total,
+        })
+      : undefined;
+    const [ownerResult, buyerResult] = await Promise.all([
+      resend.emails.send(
+        {
+          from: emailFrom,
+          to: notificationEmail,
+          subject: `Novo presente recebido — ${formatBRL(total)}`,
+          ...ownerContent,
+        },
+        { idempotencyKey: `mercadopago/${order.id}/owner` },
+      ),
+      buyerEmail && buyerContent
+        ? resend.emails.send(
+            {
+              from: emailFrom,
+              to: buyerEmail,
+              subject: "Pagamento confirmado — Chá das duas ervilhinhas",
+              ...buyerContent,
+            },
+            { idempotencyKey: `mercadopago/${order.id}/buyer` },
+          )
+        : Promise.resolve(undefined),
+    ]);
 
-    const ownerResult = await resend.emails.send(
-      {
-        from: emailFrom,
-        to: notificationEmail,
-        subject: `Novo presente recebido — ${formatBRL(total)}`,
-        ...ownerContent,
-      },
-      { idempotencyKey: `mercadopago/${order.id}/owner` },
-    );
+    if (!buyerEmail) {
+      console.warn("Buyer confirmation skipped because no email was returned", {
+        orderId,
+      });
+    }
 
-    if (ownerResult.error) {
+    if (ownerResult.error || buyerResult?.error) {
       console.error("Resend failed to send payment confirmation", {
         orderId,
         ownerError: ownerResult.error?.name,
+        buyerError: buyerResult?.error?.name,
       });
       return Response.json({ error: "Email delivery failed" }, { status: 502 });
     }

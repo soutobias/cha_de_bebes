@@ -15,7 +15,7 @@ export default async function CarrinhoPage() {
     before:absolute before:inset-0 before:-z-10
     before:bg-[url('/images/banner.png')]
     before:bg-cover before:bg-center before:bg-fixed
-    before:opacity-50
+    before:opacity-40
     max-sm:before:bg-[url('/images/banner-mobile.png')]
     max-sm:before:bg-scroll
     pt-28 pb-14
