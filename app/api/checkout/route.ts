@@ -1,7 +1,10 @@
 import { MercadoPagoConfig, Order } from "mercadopago";
 import giftsData from "@/data/presentes.json";
 import { MAX_ITEM_QUANTITY, type CartItem, type Gift } from "@/lib/cart";
-import { encryptPaymentEmail } from "@/lib/payment-email-token";
+import {
+  encryptPaymentEmail,
+  encryptPaymentEmailReference,
+} from "@/lib/payment-email-token";
 
 export const runtime = "nodejs";
 
@@ -50,7 +53,10 @@ export async function POST(request: Request) {
       ? (payload as { email: string }).email.trim().toLowerCase()
       : "";
 
-  if (submittedEmail.length > 254 || !EMAIL_PATTERN.test(submittedEmail)) {
+  if (
+    Buffer.byteLength(submittedEmail, "utf8") > 40 ||
+    !EMAIL_PATTERN.test(submittedEmail)
+  ) {
     return Response.json(
       { error: "Informe um e-mail válido para continuar." },
       { status: 400 },
@@ -120,6 +126,10 @@ export async function POST(request: Request) {
   }
 
   const buyerToken = encryptPaymentEmail(submittedEmail, webhookSecret);
+  const buyerReference = encryptPaymentEmailReference(
+    submittedEmail,
+    webhookSecret,
+  );
   const webhookUrl = new URL("/api/mercadopago/webhook", siteUrl);
   webhookUrl.searchParams.set("buyer", buyerToken);
 
@@ -137,7 +147,7 @@ export async function POST(request: Request) {
         currency: "BRL",
         total_amount: totalAmount.toFixed(2),
         items: orderItems,
-        external_reference: crypto.randomUUID(),
+        external_reference: buyerReference,
         description: "Presentes para o chá de bebê",
         ...(!isTestMode ? { payer: { email: submittedEmail } } : {}),
         config: {

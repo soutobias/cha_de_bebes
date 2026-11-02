@@ -8,7 +8,10 @@ import {
 import { Resend } from "resend";
 import giftsData from "@/data/presentes.json";
 import type { Gift } from "@/lib/cart";
-import { decryptPaymentEmail } from "@/lib/payment-email-token";
+import {
+  decryptPaymentEmail,
+  decryptPaymentEmailReference,
+} from "@/lib/payment-email-token";
 
 export const runtime = "nodejs";
 
@@ -358,7 +361,19 @@ export async function POST(request: Request) {
           .map(normalizeEmail)
           .find((email) => email !== undefined)
       : undefined;
-    let buyerEmail = normalizeEmail(order.payer?.email) ?? tokenEmail;
+    const referenceEmail = order.external_reference
+      ? secretCandidates
+          .map((secret) =>
+            decryptPaymentEmailReference(
+              order.external_reference!,
+              secret.value,
+            ),
+          )
+          .map(normalizeEmail)
+          .find((email) => email !== undefined)
+      : undefined;
+    let buyerEmail =
+      normalizeEmail(order.payer?.email) ?? tokenEmail ?? referenceEmail;
 
     if (!buyerEmail) {
       const paymentReferenceId = payload.data?.transactions?.payments?.find(

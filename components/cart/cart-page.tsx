@@ -425,6 +425,7 @@ export function CartPage() {
             type="email"
             inputMode="email"
             autoComplete="email"
+            maxLength={40}
             placeholder="seuemail@exemplo.com"
             value={email}
             aria-describedby="checkout-email-help"
