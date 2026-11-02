@@ -465,7 +465,7 @@ export async function POST(request: Request) {
             {
               from: emailFrom,
               to: buyerEmail,
-              subject: "Pagamento confirmado — Chá das duas ervilhinhas",
+              subject: "Pedido efetuado — Bebês Tonessa",
               ...buyerContent,
             },
             { idempotencyKey: `mercadopago/${order.id}/buyer` },
