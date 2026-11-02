@@ -8,6 +8,7 @@ import {
 import { Resend } from "resend";
 import giftsData from "@/data/presentes.json";
 import type { Gift } from "@/lib/cart";
+import { decryptPaymentEmail } from "@/lib/payment-email-token";
 
 export const runtime = "nodejs";
 
@@ -227,6 +228,7 @@ export async function POST(request: Request) {
   }
 
   const requestUrl = new URL(request.url);
+  const buyerToken = requestUrl.searchParams.get("buyer");
   const queryDataId =
     requestUrl.searchParams.get("data.id") ??
     requestUrl.searchParams.get("data_id");
@@ -348,7 +350,15 @@ export async function POST(request: Request) {
       return Response.json({ received: true, emailSent: false });
     }
 
-    let buyerEmail = normalizeEmail(order.payer?.email);
+    const tokenEmail = buyerToken
+      ? secretCandidates
+          .map((secret) =>
+            decryptPaymentEmail(buyerToken, secret.value),
+          )
+          .map(normalizeEmail)
+          .find((email) => email !== undefined)
+      : undefined;
+    let buyerEmail = normalizeEmail(order.payer?.email) ?? tokenEmail;
 
     if (!buyerEmail) {
       const paymentReferenceId = payload.data?.transactions?.payments?.find(

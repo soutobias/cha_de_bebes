@@ -1,6 +1,7 @@
 import { MercadoPagoConfig, Order } from "mercadopago";
 import giftsData from "@/data/presentes.json";
 import { MAX_ITEM_QUANTITY, type CartItem, type Gift } from "@/lib/cart";
+import { encryptPaymentEmail } from "@/lib/payment-email-token";
 
 export const runtime = "nodejs";
 
@@ -104,6 +105,23 @@ export async function POST(request: Request) {
   const configuredSiteUrl = process.env.SITE_URL?.replace(/\/$/, "");
   const siteUrl = configuredSiteUrl || new URL(request.url).origin;
   const isTestMode = process.env.MERCADO_PAGO_TEST_MODE === "true";
+  const webhookSecret = (
+    isTestMode
+      ? process.env.MERCADO_PAGO_WEBHOOK_SECRET_TEST ||
+        process.env.MERCADO_PAGO_WEBHOOK_SECRET
+      : process.env.MERCADO_PAGO_WEBHOOK_SECRET
+  )?.trim();
+
+  if (!webhookSecret) {
+    return Response.json(
+      { error: "A confirmação do pagamento ainda não foi configurada." },
+      { status: 503 },
+    );
+  }
+
+  const buyerToken = encryptPaymentEmail(submittedEmail, webhookSecret);
+  const webhookUrl = new URL("/api/mercadopago/webhook", siteUrl);
+  webhookUrl.searchParams.set("buyer", buyerToken);
 
   try {
     const client = new MercadoPagoConfig({
@@ -125,7 +143,7 @@ export async function POST(request: Request) {
         config: {
           statement_descriptor: "CHA GEMEOS",
           online: {
-            callback_url: `${siteUrl}/api/mercadopago/webhook`,
+            callback_url: webhookUrl.toString(),
             success_url: `${siteUrl}/carrinho?status=success`,
             pending_url: `${siteUrl}/carrinho?status=pending`,
             failure_url: `${siteUrl}/carrinho?status=failure`,
