@@ -60,12 +60,10 @@ export default async function PresentesPage() {
           {siteVariant === "uk" ? (
             <div className="space-y-4 pt-5 leading-7 text-muted">
               <p>
-                Preparamos com muito carinho uma lista de chá de bebê na Amazon
-                com alguns itens que vão nos ajudar a receber nossos pequenos!
-              </p>
-              <p>
-                Agradecemos de coração por todo o carinho e por fazer parte
-                desse momento tão especial das nossas vidas! 🫛🫛
+                Estamos preparando com muito carinho uma lista de chá de bebê na
+                Amazon com alguns itens que vão nos ajudar a receber nossos
+                pequenos! Agradecemos de coração por todo o carinho e por fazer
+                parte desse momento tão especial das nossas vidas! 🫛🫛
               </p>
             </div>
           ) : (
