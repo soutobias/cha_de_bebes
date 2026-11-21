@@ -57,14 +57,13 @@ export function GiftList({
       {siteVariant === "uk" ? (
         <div className="flex justify-center">
           <a
-            className="rounded-full bg-forest px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f] aria-disabled:text-gray-400 aria-disabled:pointer-events-none aria-disabled:no-underline"
-            aria-disabled="true"
+            className="rounded-full bg-forest px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#29462f]"
             href={UK_GIFT_LIST_URL}
             target="_blank"
 
             rel="noopener noreferrer"
           >
-            Lista de presentes disponível em breve ↗
+            Lista de presentes ↗
           </a>
         </div>
       ) : (

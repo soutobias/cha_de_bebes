@@ -1,7 +1,7 @@
 export type SiteVariant = "br" | "uk";
 
 export const UK_GIFT_LIST_URL =
-  "https://www.amazon.co.uk/baby-reg/vanessa-rodrigues-november-2026-liverpool/37MCPW5EP469F";
+  "https://www.amazon.co.uk/baby-reg/bebstonessa-rodrigues-december-2026-liverpool/37MCPW5EP469F?ref_=cm_sw_r_mwn_dp_49BEE0SNE48YVPZSPG8F&language=en-US";
 export const UK_CONFIRMATION_URL = "https://forms.gle/GcwYR5CktKobe28S8";
 
 export function getSiteVariantFromHost(host: string | null): SiteVariant {
